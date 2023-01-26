@@ -1,3 +1,8 @@
+/*
+ * Kingsley U
+ * 26/01/2023
+ * APCSA
+ */
 package application;
 
 import java.io.FileInputStream;
@@ -6,8 +11,10 @@ import java.util.Properties;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.DriverManager;
-
+import java.sql.SQLException;
+import java.sql.Statement;
 
 
 public class CrewDb {
@@ -78,13 +85,40 @@ public class CrewDb {
 	
 	//CRUD
 	public String addRecord(CrewRecord crew) {
-		String query = "";
+		String query = ""; //Leaving blank until the table structure is fleshed out
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(query);
 			
+			preparedStatement.setInt(1, crew.getPilot());
+			preparedStatement.setInt(2, crew.getCopilot());
+			preparedStatement.setInt(3, crew.getFa1());
+			preparedStatement.setInt(4, crew.getFa2());
+			preparedStatement.setString(5, crew.getAirline());
+			
+			preparedStatement.executeUpdate();
+			
+			load();
+			return "Record added";
 		}catch(Exception e){
 			e.printStackTrace();
 			return e.toString();		}
+	}
+	
+	public String load() {
+		try {
+			getResults().clear();
+			Statement st = connection.createStatement();
+			setRs(st.executeQuery("SELECT * FROM ORDER BY Pilot asc"));
+			while(getRs().next()) {
+				getResults().add(new CrewRecord(rs.getInt(1),rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getString(5)));
+				return "Records loaded";
+			}
+			
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
 	}
 	
 	
